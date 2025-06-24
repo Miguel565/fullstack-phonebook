@@ -1,0 +1,29 @@
+{
+  "name": "fullstack-phonebook",
+  "version": "1.0.0",
+  "description": "En esta parte, nuestro enfoque se desplaza hacia el backend, es decir, hacia la implementación de la funcionalidad en el lado del servidor. Implementaremos una API REST simple en Node.js utilizando la librería [Express](https://expressjs.com/), y los datos de la aplicación se almacenarán en una base de datos [MongoDB](https://www.mongodb.com/docs/). Al final de esta parte, desplegaremos nuestra aplicación en Internet.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Miguel565/fullstack-phonebook.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Miguel565/fullstack-phonebook/issues"
+  },
+  "homepage": "https://github.com/Miguel565/fullstack-phonebook#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
