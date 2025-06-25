@@ -45,8 +45,30 @@ app.get('/api/persons/:id', (req, res) => {
     }
 })
 
+const generateId =() => {
+    const countId = contacts.length
+    return countId > 0 ? Math.max(...contacts.map(c => c.id)) + 1 : 0
+}
+
+app.post('/api/persons', (req, res) => {
+    const body = req.body
+    if(!body.name || !body.number){
+        return res.status(400).json({ error: 'name or number missing' })
+    }
+    const contact = {
+        id: generateId(),
+        name: body.name,
+        number: body.number
+    }
+    if(contacts.some(c => c.name === contact.name)){
+        return res.status(400).json({ error: 'The name already exists in the phonebook' })
+    }
+    contacts = contacts.concat(contact)
+    res.json(contact)
+})
+
 app.delete('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
+    const id = req.params.id
     contacts = contacts.filter(contact => contact.id !== id)
 
     res.status(204).end()
