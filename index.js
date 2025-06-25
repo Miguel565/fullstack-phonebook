@@ -35,6 +35,16 @@ app.get('/api/persons', (req, res) => {
     res.json(contacts)
 })
 
+app.get('/api/persons/:id', (req, res) => {
+    const id = Number(req.params.id)
+    const contact = contacts.find(contact => contact.id === id)
+    if(contact){
+        res.json(contact)
+    } else {
+        res.status(404).end()
+    }
+})
+
 app.get('/info', (req, res) => {
     const date = new Date()
     const count = contacts.length
