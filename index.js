@@ -1,7 +1,8 @@
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
-const PORT = 3001
+const cors = require('cors')
+const PORT = process.even.PORT || 3001
 
 let contacts = [
     {
@@ -28,6 +29,7 @@ let contacts = [
 
 app.use(express.json())
 app.use(morgan('tiny'))
+app.use(cors())
 morgan.token('data', (req) => {
     return req.method === 'POST' ? JSON.stringify(req.body) : ''
 })
@@ -85,6 +87,12 @@ app.get('/info', (req, res) => {
     const count = contacts.length
     res.send(`<p>Phonebook has info for ${count} people</p><br /><p>${date}</p>`)
 })
+
+const unknowEndPoint = (req, res) => {
+    res.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknowEndPoint)
 
 app.listen(PORT, () => {
     console.log(`Server running on port: ${PORT}`)
