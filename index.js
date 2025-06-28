@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const morgan = require('morgan')
 const cors = require('cors')
-const PORT = process.even.PORT || 3001
+const PORT = process.env.PORT || 3001
 
 let contacts = [
     {
