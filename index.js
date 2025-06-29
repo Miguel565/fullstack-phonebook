@@ -27,6 +27,7 @@ let contacts = [
     }
 ]
 
+app.use(express.static('dist'))
 app.use(express.json())
 app.use(morgan('tiny'))
 app.use(cors())
