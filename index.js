@@ -1,31 +1,12 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
 const cors = require('cors')
-const PORT = process.env.PORT || 3001
+const Person = require('./models/person')
+const PORT = process.env.PORT
 
-let contacts = [
-    {
-        id: 1,
-        name: 'Arto Hellas',
-        number: '040-123456'
-    },
-    {
-        id: 2,
-        name: 'Ada Lovelace',
-        number: '39-44-5323523'
-    },
-    {
-        id: 3,
-        name: 'Dan Abramov',
-        number: '12-43-234345'
-    },
-    {
-        id: 4,
-        name: 'Mary Poppendieck',
-        number: '39-23-6423122'
-    }
-]
+let persons = []
 
 app.use(express.static('dist'))
 app.use(express.json())
@@ -41,51 +22,58 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/persons', (req, res) => {
-    res.json(contacts)
+    Person.find({}).then(persons => {
+        res.json(persons)
+    }).catch(error => {
+        console.error('Error fetching persons: ', error.message)
+        res.status(500).json({ error: 'Internal server error' })
+    })
 })
 
 app.get('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
-    const contact = contacts.find(contact => contact.id === id)
-    if(contact){
-        res.json(contact)
-    } else {
-        res.status(404).end()
-    }
+    Person.findById(req.params.id).then((person) => {
+        if(person){
+            res.json(person)
+        } else {
+            res.status(404).json({ error: 'Person not found' })
+        }
+    }).catch(error => {
+        console.error('Error fetching person: ', error.message)
+        res.status(500).json({ error: 'Internal server error' })
+    })
 })
-
-const generateId =() => {
-    const countId = contacts.length
-    return countId > 0 ? Math.max(...contacts.map(c => c.id)) + 1 : 0
-}
 
 app.post('/api/persons', (req, res) => {
     const body = req.body
     if(!body.name || !body.number){
         return res.status(400).json({ error: 'name or number missing' })
     }
-    const contact = {
-        id: generateId(),
+    const person = new Person({
         name: body.name,
         number: body.number
-    }
-    if(contacts.some(c => c.name === contact.name)){
-        return res.status(400).json({ error: 'The name already exists in the phonebook' })
-    }
-    contacts = contacts.concat(contact)
-    res.json(contact)
+    })
+    person.save().then(savedPerson => {
+        if(savedPerson){
+            res.status(201).json(savedPerson)
+        } else{
+            res.status(400).json({ error: 'Failed to save person' })
+        }
+    }).catch(error => {
+        console.log('Error saving person: ', error.message)
+        res.status(500).json({ error: 'Internal server error' })
+    })
 })
 
 app.delete('/api/persons/:id', (req, res) => {
     const id = req.params.id
-    contacts = contacts.filter(contact => contact.id !== id)
+    persons = persons.filter(person => person.id !== id)
 
     res.status(204).end()
 })
 
 app.get('/info', (req, res) => {
     const date = new Date()
-    const count = contacts.length
+    const count = persons.length
     res.send(`<p>Phonebook has info for ${count} people</p><br /><p>${date}</p>`)
 })
 
