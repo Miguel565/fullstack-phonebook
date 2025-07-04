@@ -8,6 +8,14 @@ const PORT = process.env.PORT
 
 let persons = []
 
+const errorHandler = (error, req, res, next) => {
+    console.error(error.message)
+    if (error.name === 'CastError') {
+        return res.status(400).send({ error: 'malformatted id' })
+    }
+    next(error)
+}
+
 app.use(express.static('dist'))
 app.use(express.json())
 app.use(morgan('tiny'))
@@ -21,29 +29,23 @@ app.get('/', (req, res) => {
     res.send('<h1>The phonebook</h1>')
 })
 
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (req, res, next) => {
     Person.find({}).then(persons => {
         res.json(persons)
-    }).catch(error => {
-        console.error('Error fetching persons: ', error.message)
-        res.status(500).json({ error: 'Internal server error' }).end()
-    })
+    }).catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
     Person.findById(req.params.id).then((person) => {
         if(person){
             res.json(person)
         } else {
-            res.status(404).json({ error: 'Person not found' }).end()
+            res.status(404).end()
         }
-    }).catch(error => {
-        console.error('Error fetching person: ', error.message)
-        res.status(500).json({ error: 'Internal server error' })
-    })
+    }).catch(error => next(error))
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
     const body = req.body
     if(!body.name || !body.number){
         return res.status(400).json({ error: 'name or number missing' })
@@ -56,22 +58,16 @@ app.post('/api/persons', (req, res) => {
         if(savedPerson){
             res.status(201).end()
         } else{
-            res.status(400).json({ error: 'Failed to save person' }).end()
+            res.status(400).end()
         }
-    }).catch(error => {
-        console.log('Error saving person: ', error.message)
-        res.status(500).json({ error: 'Internal server error' })
-    })
+    }).catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
     Person.findByIdAndDelete(req.params.id)
         .then(result => {
             res.status(204).end()
-        }).catch(error => {
-            console.log('Error deleting person: ', error.message)
-            res.status(500).end()
-        })
+        }).catch(error => next(error))
 })
 
 app.get('/info', (req, res) => {
@@ -85,6 +81,8 @@ const unknowEndPoint = (req, res) => {
 }
 
 app.use(unknowEndPoint)
+
+app.use(errorHandler)
 
 app.listen(PORT, () => {
     console.log(`Server running on port: ${PORT}`)
