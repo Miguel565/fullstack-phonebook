@@ -63,6 +63,25 @@ app.post('/api/persons', (req, res, next) => {
     }).catch(error => next(error))
 })
 
+app.put('/api/persons/:id', (req, res, next) => {
+    const body = req.body
+    if(!body.name || !body.number){
+        return res.status(400).json({ error: 'name or number missing' })
+    }
+    const person ={
+        name: body.name,
+        number: body.number
+    }
+    Person.findByIdAndUpdate(req.params.id, person, { new: true, runValidators: true, context: 'query' })
+        .then(updatePerson => {
+            if(updatePerson){
+                res.json(updatePerson)
+            } else {
+                res.status(404).end()
+            }
+        }).catch(error => next(error))
+})
+
 app.delete('/api/persons/:id', (req, res, next) => {
     Person.findByIdAndDelete(req.params.id)
         .then(result => {
@@ -72,8 +91,12 @@ app.delete('/api/persons/:id', (req, res, next) => {
 
 app.get('/info', (req, res) => {
     const date = new Date()
-    const count = persons.length
-    res.send(`<p>Phonebook has info for ${count} people</p><br /><p>${date}</p>`)
+    Person.find({}).then(persons => {
+        const count = persons.length
+        res.send(`<p>Phonebook has info for ${count} people</p><br /><p>${date}</p>`)
+    }).catch(error => {
+        console.error(error)
+    })
 })
 
 const unknowEndPoint = (req, res) => {
