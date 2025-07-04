@@ -26,7 +26,7 @@ app.get('/api/persons', (req, res) => {
         res.json(persons)
     }).catch(error => {
         console.error('Error fetching persons: ', error.message)
-        res.status(500).json({ error: 'Internal server error' })
+        res.status(500).json({ error: 'Internal server error' }).end()
     })
 })
 
@@ -35,7 +35,7 @@ app.get('/api/persons/:id', (req, res) => {
         if(person){
             res.json(person)
         } else {
-            res.status(404).json({ error: 'Person not found' })
+            res.status(404).json({ error: 'Person not found' }).end()
         }
     }).catch(error => {
         console.error('Error fetching person: ', error.message)
@@ -54,9 +54,9 @@ app.post('/api/persons', (req, res) => {
     })
     person.save().then(savedPerson => {
         if(savedPerson){
-            res.status(201).json(savedPerson)
+            res.status(201).end()
         } else{
-            res.status(400).json({ error: 'Failed to save person' })
+            res.status(400).json({ error: 'Failed to save person' }).end()
         }
     }).catch(error => {
         console.log('Error saving person: ', error.message)
@@ -65,10 +65,13 @@ app.post('/api/persons', (req, res) => {
 })
 
 app.delete('/api/persons/:id', (req, res) => {
-    const id = req.params.id
-    persons = persons.filter(person => person.id !== id)
-
-    res.status(204).end()
+    Person.findByIdAndDelete(req.params.id)
+        .then(result => {
+            res.status(204).end()
+        }).catch(error => {
+            console.log('Error deleting person: ', error.message)
+            res.status(500).end()
+        })
 })
 
 app.get('/info', (req, res) => {
