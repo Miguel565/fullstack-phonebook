@@ -4,6 +4,7 @@
   "description": "En esta parte, nuestro enfoque se desplaza hacia el backend, es decir, hacia la implementación de la funcionalidad en el lado del servidor. Implementaremos una API REST simple en Node.js utilizando la librería [Express](https://expressjs.com/), y los datos de la aplicación se almacenarán en una base de datos [MongoDB](https://www.mongodb.com/docs/). Al final de esta parte, desplegaremos nuestra aplicación en Internet.",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint .",
     "start": "node index.js",
     "dev": "nodemon index.js",
     "build:ui": "rm -rf dist && cd ../Fullstack/part2/phonebook && npm run build && cp -r dist ../../../fullstack-phonebook",
@@ -31,6 +32,10 @@
     "normalize-mongoose": "^1.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.30.1",
+    "@stylistic/eslint-plugin-js": "^4.4.1",
+    "eslint": "^9.30.1",
+    "globals": "^16.3.0",
     "nodemon": "^3.1.10"
   }
 }
